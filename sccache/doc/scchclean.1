@@ -1,0 +1,38 @@
+.TH SCCHCLEAN 1 "Version 0.1.1: 08 Feb 2003"
+.SH NAME
+scchclean \- Simple Compile Cache Cleanup
+.SH SYNOPSIS
+.B scchclean <cache-dir>
+
+.SH DESCRIPTION
+.I scchclean
+is part of the sccache package.  It will cleanup the cache-data that
+resides in the directory <cache-dir>.  Therefore it checks the link
+count of each cached object-file.  Each cache entry which's object
+file's link count is 1 will be deleted.  That means that not only
+the object file but also the error and stdout file will be deleted.
+
+.SH PARAMETERS
+.TP
+.B <cache-dir>
+This is the base directory in which all the cached data resides.  To
+have good use of sccache, the directory should always be the same,
+when working on one project.
+
+.SH "SEE ALSO"
+sccache(1), scchclean(1)
+
+.SH COPYRIGHT
+Copyright (C) 2003  Marcus Perlick
+.PP
+The sccache package is distributed under the terms of the GNU General
+Public License.
+.PP
+Is is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+.SH AUTHOR
+.PP
+Marcus Perlick <riffraff@users.sourceforge.net>

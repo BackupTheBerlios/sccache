@@ -1,0 +1,98 @@
+.TH SCCACHE 1 "Version 0.1.1: 07 Feb 2003"
+.SH NAME
+sccache \- Simple Compile Cache
+.SH SYNOPSIS
+.B sccache <cache-dir> <source> <object> <pp-cmd> <cc-cmd>
+
+.SH DESCRIPTION
+Sccache speeds up development of large software projects written in C/C++,
+especially when it is shared among a lot of programmers on similar
+source views.
+.br
+The 1st thing, sccache does, is to run the preprocessing command
+<pp-cmd> plus the <source>-file from the command-line redirecting the
+standard output to a temporary file in the cache.  When this is done,
+it computes an md4-hash from <source>, <pp-cmd> and <cc-cmd> plus the
+preprocessor output.  If sccache finds output for that md4-hash in the
+cache directory, that output is moved to the user-space.  I.e. object
+files are hard-linked to the <object> location and std- & error output
+is written to stdout / stderr.
+.br
+If nothing can be found in the cache, the preprocessor output is
+compiled into the cache - using <cc-cmd> -o <object> <tmp-file> -,
+along with the stdout & stderr output from the compile run.  Whether the
+compile is good or not, the cached data is moved to the user-space
+afterwards.
+
+.SH PARAMETERS
+.TP
+.B <cache-dir>
+This is the base directory in which all the cached data resides.  To
+have good use of sccache, the directory should always be the same,
+when working on one project.
+.TP
+.B <source>
+This is the source file as you would place it on the compiler's
+command line.
+.TP
+.B <object>
+This is the object file, you want to produce with the single compiler
+invocation.  Normally you will find this as the argument to the
+compiler-option '-o'.
+.TP
+.B <pp-cmd>
+This is the "stem" for the preprocessor call to the compiler.
+.I sccache
+will append the <source> parameter, separated by a single space, and
+execute the command. The standard output of the command is placed in a
+temporary file in the cache directory.
+.TP
+.B <cc-cmd>
+If
+.I sccache
+finds nothing appropriate in the cache, it thinks that is has to
+compile the previously preprocessed <source>-file to an object file
+that will reside somewhere in the cache. It will do this using
+something like
+.LP
+.RS 8
+<cc-cmd> -o <cached file> <tmp file>
+.RE
+
+.SH EXAMPLE
+Consider you have some makefile rule like this to build your object
+files from C-source:
+.LP
+%.o %.d: %.c
+.br
+    gcc $(CFLAGS) -MMD -c -o $*.o $<
+.LP
+With sccache it should be rewritten to:
+.LP
+%.o %.d: %.c
+.br
+    sccache $(SCCHDIR) $< $*.o "gcc -E -MD" \\
+.br
+    "gcc $(CFLAGS) -c"
+.LP
+Note that the original rule would only create the dependency file when
+you use the GNU gcc.  The sccache-alized version has a good chance to
+do it with other compilers, too.
+
+.SH "SEE ALSO"
+scchadm(1), scchclean(1)
+
+.SH COPYRIGHT
+Copyright (C) 2003  Marcus Perlick
+.PP
+The sccache package is distributed under the terms of the GNU General
+Public License.
+.PP
+Is is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+.SH AUTHOR
+.PP
+Marcus Perlick <riffraff@users.sourceforge.net>

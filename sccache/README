@@ -1,0 +1,4 @@
+To just build the distribution, type "make" in this directory.  If you
+want to install the stuff, type "make install". This will install the
+package in /usr/local. If you want to install the package somewhere
+else, let's say in <prefix>, then type "make PREFIX=<prefix> install".
